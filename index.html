@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:100,300,400,600" rel="stylesheet" type="text/css">
+        <link href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css">
+        <link type="text/css" rel="stylesheet" href="style.css">
+        <title>Pace Calculator</title>
+    </head>
+    <body>
+
+        <div class="top">
+            <div class="pace">
+                <div class="pace__title">
+                    Running Pace:
+                </div>
+
+                <div class="pace__km clearfix">
+                    <div class="pace__km--text">Min / Km</div>
+                    <div class="right clearfix">
+                        <div class="pace__km--value">4:00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom">
+            <div class="add">
+                <div class="add__container">
+                    <input type="number" class="add__distance" placeholder="Distance in Km", value=5000>
+                    <input type="text" class="add__time" placeholder="20:00", value="20:00">
+                    <button class="add__btn"><i class="ion-ios-checkmark-outline"></i></button>
+                </div>
+            </div>
+
+            <div class="container clearfix">
+                <div class="pace_breakdown">
+                    <h2 class="pace__breakdown__title">Pace Breakdown</h2>
+
+                    <div class="pace_breakdown__list">
+
+                        <!--
+                        <div class="item clearfix" id="pace_breakdown-0">
+                            <div class="item__description">Salary</div>
+                            <div class="right clearfix">
+                                <div class="item__value">+ 2,100.00</div>
+                                <div class="item__delete">
+                                    <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="item clearfix" id="pace_breakdown-1">
+                            <div class="item__description">Sold car</div>
+                            <div class="right clearfix">
+                                <div class="item__value">+ 1,500.00</div>
+                                <div class="item__delete">
+                                    <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        -->
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <script src="app.js"></script>
+    </body>
+</html>
