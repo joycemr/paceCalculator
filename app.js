@@ -81,6 +81,10 @@ var paceController = (function() {
 
             // calculate the track paces
             return new paces(runTime.secondsPerMeter);
+        },
+
+        getNewRuntime: function(input) {
+            return newRunTime(input);
         }
 
     }
@@ -111,6 +115,15 @@ var UIController = (function() {
             document.querySelector(DOMStrings.kmPaceDisplay).textContent = allPaces.pace1000Min;
         },
 
+        addListTitle: function(runTime) {
+            var html, newHtml, element;
+            element = DOMStrings.paceList;
+            html = '<div class="item clearfix" id="inc-%id%"><div class="item__description">Paces for %distance% KM at: %time%</div>'
+            newHtml = html.replace('%distance%', runTime.distInMeters);
+            newHtml = newHtml.replace('%time%', runTime.time);
+            document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+        },
+
         addListItem: function(newPace) {
             var html, newHtml, element;
             element = DOMStrings.paceList;
@@ -119,8 +132,7 @@ var UIController = (function() {
                 <div class="item__value">%time% %time-measure%</div> \
             </div> \
             </div>'
-            newHtml = html.replace('%id%', newPace.id);
-            newHtml = newHtml.replace('%distance%', newPace.distance);
+            newHtml = html.replace('%distance%', newPace.distance);
             newHtml = newHtml.replace('%time%', newPace.time);
             newHtml = newHtml.replace('%time-measure%', newPace.timeMeasure);
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
@@ -148,6 +160,9 @@ var controller = (function(paceCtrl, uiCtrl) {
 
         // Get the input data
         input = uiCtrl.getInput();
+        var runTime = paceCtrl.getNewRuntime(input)
+
+        // DEBUG
         console.log(input);
 
         // fill in the calculated paces
@@ -156,21 +171,23 @@ var controller = (function(paceCtrl, uiCtrl) {
         // display the KM pace
         uiCtrl.displayKmPace(allPaces);
 
+        // display track paces title block
+        uiCtrl.addListTitle(runTime);
+
         // display track paces
         var newPace = {
-            id: 0,
             distance: "400",
             time: allPaces.pace400,
             timeMeasure: 'Seconds'
         }
         uiCtrl.addListItem(newPace);
         newPace = {
-            id: 1,
             distance: "400",
             time: allPaces.pace400Min,
             timeMeasure: 'Min:Sec'
         }
         uiCtrl.addListItem(newPace);
+
     };
 
     return {
