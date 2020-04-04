@@ -9,6 +9,11 @@ var paceController = (function() {
         this.secondsPerMeter = this.timeInSeconds / this.distInMeters;
     }
 
+    var paces = function(secondsPerMeter) {
+        this.secondsPerMeter = secondsPerMeter;
+        this.kmPaceMin = timeInMinutes(trackTime(secondsPerMeter, 1000));
+    }
+
     const trackDistances = [100, 200, 400, 800, 1000, 1200, 1600];
 
     function timeInMinutes(timeInSeconds) {
@@ -56,7 +61,14 @@ var paceController = (function() {
     return {
 
         calculatePaces(input) {
+            // console testing
             pace100m(input);
+
+            // calculate the raw values
+            const runTime = newRunTime(input);
+
+            // calculate the track paces
+            return new paces(runTime.secondsPerMeter);
         }
 
     }
@@ -70,7 +82,8 @@ var UIController = (function() {
     var DOMStrings = {
         inputDistance: '.add__distance',
         inputTime: '.add__time',
-        addButton: '.add__btn'
+        addButton: '.add__btn',
+        kmPaceDisplay: '.pace__km--value'
     }
 
     return {
@@ -79,6 +92,10 @@ var UIController = (function() {
                 distance: document.querySelector(DOMStrings.inputDistance).value,
                 time: document.querySelector(DOMStrings.inputTime).value
             }
+        },
+
+        displayKmPace: function(allPaces) {
+            document.querySelector(DOMStrings.kmPaceDisplay).textContent = allPaces.kmPaceMin;
         },
 
         getDOMStrings: function() {
@@ -100,11 +117,16 @@ var controller = (function(paceCtrl, uiCtrl) {
     var ctrlAddTime = function() {
         console.log("I am here");
         var input
+
         // Get the input data
         input = uiCtrl.getInput();
         console.log(input);
-        // pass it to the main function
-        paceCtrl.calculatePaces(input);
+
+        // fill in the calculated paces
+        allPaces = paceCtrl.calculatePaces(input);
+
+        // display the KM pace
+        uiCtrl.displayKmPace(allPaces);
     };
 
     return {
