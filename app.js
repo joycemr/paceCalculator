@@ -60,7 +60,7 @@ var paceController = (function() {
 
     return {
 
-        calculatePaces(input) {
+        calculatePaces: function(input) {
             // console testing
             pace100m(input);
 
