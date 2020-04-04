@@ -10,9 +10,21 @@ var paceController = (function() {
     }
 
     var paces = function(secondsPerMeter) {
-        this.secondsPerMeter = secondsPerMeter;
-        this.kmPaceMin = timeInMinutes(trackTime(secondsPerMeter, 1000));
-    }
+        this.pace100 = trackTime(secondsPerMeter, 100);
+        this.pace100Min = timeInMinutes(trackTime(secondsPerMeter, 100));
+        this.pace200 = trackTime(secondsPerMeter, 200);
+        this.pace200Min = timeInMinutes(trackTime(secondsPerMeter, 200));
+        this.pace400 = trackTime(secondsPerMeter, 400);
+        this.pace400Min = timeInMinutes(trackTime(secondsPerMeter, 400));
+        this.pace800 = trackTime(secondsPerMeter, 800);
+        this.pace800Min = timeInMinutes(trackTime(secondsPerMeter, 800));
+        this.pace1000 = trackTime(secondsPerMeter, 1000);
+        this.pace1000Min = timeInMinutes(trackTime(secondsPerMeter, 1000));
+        this.pace1200 = trackTime(secondsPerMeter, 1200);
+        this.pace1200Min = timeInMinutes(trackTime(secondsPerMeter, 1200));
+        this.pace1600 = trackTime(secondsPerMeter, 1600);
+        this.pace1600Min = timeInMinutes(trackTime(secondsPerMeter, 1600));
+      }
 
     const trackDistances = [100, 200, 400, 800, 1000, 1200, 1600];
 
@@ -83,7 +95,8 @@ var UIController = (function() {
         inputDistance: '.add__distance',
         inputTime: '.add__time',
         addButton: '.add__btn',
-        kmPaceDisplay: '.pace__km--value'
+        kmPaceDisplay: '.pace__km--value',
+        paceList: '.pace_breakdown__list'
     }
 
     return {
@@ -95,7 +108,22 @@ var UIController = (function() {
         },
 
         displayKmPace: function(allPaces) {
-            document.querySelector(DOMStrings.kmPaceDisplay).textContent = allPaces.kmPaceMin;
+            document.querySelector(DOMStrings.kmPaceDisplay).textContent = allPaces.pace1000Min;
+        },
+
+        addListItem: function(newPace) {
+            var html, newHtml, element;
+            element = DOMStrings.paceList;
+            html = '<div class="item clearfix" id="inc-%id%"><div class="item__description">%distance%</div> \
+            <div class="right clearfix"> \
+                <div class="item__value">%time% %time-measure%</div> \
+            </div> \
+            </div>'
+            newHtml = html.replace('%id%', newPace.id);
+            newHtml = newHtml.replace('%distance%', newPace.distance);
+            newHtml = newHtml.replace('%time%', newPace.time);
+            newHtml = newHtml.replace('%time-measure%', newPace.timeMeasure);
+            document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
         },
 
         getDOMStrings: function() {
@@ -127,6 +155,22 @@ var controller = (function(paceCtrl, uiCtrl) {
 
         // display the KM pace
         uiCtrl.displayKmPace(allPaces);
+
+        // display track paces
+        var newPace = {
+            id: 0,
+            distance: "400",
+            time: allPaces.pace400,
+            timeMeasure: 'Seconds'
+        }
+        uiCtrl.addListItem(newPace);
+        newPace = {
+            id: 1,
+            distance: "400",
+            time: allPaces.pace400Min,
+            timeMeasure: 'Min:Sec'
+        }
+        uiCtrl.addListItem(newPace);
     };
 
     return {
