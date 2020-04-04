@@ -19,7 +19,7 @@ var paceController = (function() {
     function timeInMinutes(timeInSeconds) {
         const min = Math.floor(timeInSeconds / 60);
         const seconds = timeInSeconds - (min * 60);
-        return min + ':' + Math.round(seconds,2);
+        return min.toString() + ':' + Math.round(seconds,2).toString().padStart(2, '0');
     }
 
     function trackTime(secondsPerMeter, distanceInMeters) {
