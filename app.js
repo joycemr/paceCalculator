@@ -9,30 +9,29 @@ var paceController = (function() {
         this.secondsPerMeter = this.timeInSeconds / this.distInMeters;
     }
 
+    var pace = function(distance, paceSeconds, paceMinutes) {
+        this.distance = distance;
+        this.paceSeconds = paceSeconds;
+    }
+
     var paces = function(secondsPerMeter) {
         this.pace100 = trackTime(secondsPerMeter, 100);
-        this.pace100Min = timeInMinutes(trackTime(secondsPerMeter, 100));
+        this.pace100Min = convertSecondsToMinutes(trackTime(secondsPerMeter, 100));
         this.pace200 = trackTime(secondsPerMeter, 200);
-        this.pace200Min = timeInMinutes(trackTime(secondsPerMeter, 200));
+        this.pace200Min = convertSecondsToMinutes(trackTime(secondsPerMeter, 200));
         this.pace400 = trackTime(secondsPerMeter, 400);
-        this.pace400Min = timeInMinutes(trackTime(secondsPerMeter, 400));
+        this.pace400Min = convertSecondsToMinutes(trackTime(secondsPerMeter, 400));
         this.pace800 = trackTime(secondsPerMeter, 800);
-        this.pace800Min = timeInMinutes(trackTime(secondsPerMeter, 800));
+        this.pace800Min = convertSecondsToMinutes(trackTime(secondsPerMeter, 800));
         this.pace1000 = trackTime(secondsPerMeter, 1000);
-        this.pace1000Min = timeInMinutes(trackTime(secondsPerMeter, 1000));
+        this.pace1000Min = convertSecondsToMinutes(trackTime(secondsPerMeter, 1000));
         this.pace1200 = trackTime(secondsPerMeter, 1200);
-        this.pace1200Min = timeInMinutes(trackTime(secondsPerMeter, 1200));
+        this.pace1200Min = convertSecondsToMinutes(trackTime(secondsPerMeter, 1200));
         this.pace1600 = trackTime(secondsPerMeter, 1600);
-        this.pace1600Min = timeInMinutes(trackTime(secondsPerMeter, 1600));
+        this.pace1600Min = convertSecondsToMinutes(trackTime(secondsPerMeter, 1600));
       }
 
     const trackDistances = [100, 200, 400, 800, 1000, 1200, 1600];
-
-    function timeInMinutes(timeInSeconds) {
-        const min = Math.floor(timeInSeconds / 60);
-        const seconds = timeInSeconds - (min * 60);
-        return min.toString() + ':' + Math.round(seconds,2).toString().padStart(2, '0');
-    }
 
     function trackTime(secondsPerMeter, distanceInMeters) {
         return Math.round(secondsPerMeter * distanceInMeters,2);
@@ -46,45 +45,28 @@ var paceController = (function() {
         var timeInSeconds = trackTime(runTime.secondsPerMeter, trackDistance)
         console.log('time for ' + trackDistance + 'M in seconds: ' + timeInSeconds);
         if (timeInSeconds > 60) {
-            console.log('time for ' + trackDistance + 'M in minutes: ' + timeInMinutes(timeInSeconds));
+            console.log('time for ' + trackDistance + 'M in minutes: ' + convertSecondsToMinutes(timeInSeconds));
         }
     }
 
-    function pace100m(input) {
-
-        const runTime = newRunTime(input);
-
-        // Inputs
-        console.log('Race Distance in meters: ' + runTime.distInMeters);
-        console.log('Race time: ' + runTime.minutes + ':' + runTime.seconds);
-
-        // How many seconds?
-        console.log('total time in seconds: ' + runTime.timeInSeconds);
-
-        // Seconds per/meter
-        console.log('seconds per meter: ' + runTime.secondsPerMeter);
-
-        for (trackDistance of trackDistances) {
-            logTrackTime(runTime, trackDistance);
-        }
-
+    function getPace(runTime, trackDistance) {
+        var timeInSeconds = trackTime(runTime.secondsPerMeter, trackDistance);
+        var trackPace = new pace(trackDistance, timeInSeconds);
+        return trackPace;
     }
 
     return {
 
-        calculatePaces: function(input) {
-            // console testing
-            pace100m(input);
-
-            // calculate the raw values
-            const runTime = newRunTime(input);
-
-            // calculate the track paces
-            return new paces(runTime.secondsPerMeter);
-        },
-
         getNewRuntime: function(input) {
             return newRunTime(input);
+        },
+
+        getAllPaces: function(runTime) {
+            var allPaces = [];
+            for (trackDistance of trackDistances) {
+                allPaces.push(getPace(runTime, trackDistance));
+            }
+            return allPaces;
         }
 
     }
@@ -103,6 +85,12 @@ var UIController = (function() {
         paceList: '.pace_breakdown__list'
     }
 
+    function convertSecondsToMinutes(timeInSeconds) {
+        const min = Math.floor(timeInSeconds / 60);
+        const seconds = timeInSeconds - (min * 60);
+        return min.toString() + ':' + Math.round(seconds,2).toString().padStart(2, '0');
+    }
+
     return {
         getInput: function() {
             return {
@@ -111,8 +99,8 @@ var UIController = (function() {
             }
         },
 
-        displayKmPace: function(allPaces) {
-            document.querySelector(DOMStrings.kmPaceDisplay).textContent = allPaces.pace1000Min;
+        displayKmPace: function(kmPace) {
+            document.querySelector(DOMStrings.kmPaceDisplay).textContent = convertSecondsToMinutes(kmPace);
         },
 
         addListTitle: function(runTime) {
@@ -125,16 +113,21 @@ var UIController = (function() {
         },
 
         addListItem: function(newPace) {
+            console.log(newPace);
             var html, newHtml, element;
             element = DOMStrings.paceList;
             html = '<div class="item clearfix" id="inc-%id%"><div class="item__description">%distance%</div> \
             <div class="right clearfix"> \
-                <div class="item__value">%time% %time-measure%</div> \
+                <div class="item__value">%time% Seconds %minute-measure%</div> \
             </div> \
             </div>'
             newHtml = html.replace('%distance%', newPace.distance);
-            newHtml = newHtml.replace('%time%', newPace.time);
-            newHtml = newHtml.replace('%time-measure%', newPace.timeMeasure);
+            newHtml = newHtml.replace('%time%', newPace.paceSeconds);
+            if (newPace.paceSeconds > 60) {
+                var paceMin = convertSecondsToMinutes(newPace.paceSeconds);
+                newHtml = newHtml.replace('%minute-measure%', '(' + paceMin + ')');
+            }
+            newHtml = newHtml.replace('%minute-measure%', '');
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
         },
 
@@ -162,31 +155,23 @@ var controller = (function(paceCtrl, uiCtrl) {
         input = uiCtrl.getInput();
         var runTime = paceCtrl.getNewRuntime(input)
 
-        // DEBUG
-        console.log(input);
-
-        // fill in the calculated paces
-        allPaces = paceCtrl.calculatePaces(input);
+        // calculate track paces
+        var allPaces = paceCtrl.getAllPaces(runTime);
 
         // display the KM pace
-        uiCtrl.displayKmPace(allPaces);
+        for (pace of allPaces) {
+            if (pace.distance == 1000) {
+                uiCtrl.displayKmPace(pace.paceSeconds);
+            };
+        }
 
         // display track paces title block
         uiCtrl.addListTitle(runTime);
 
         // display track paces
-        var newPace = {
-            distance: "400",
-            time: allPaces.pace400,
-            timeMeasure: 'Seconds'
+        for (pace of allPaces) {
+            uiCtrl.addListItem(pace);
         }
-        uiCtrl.addListItem(newPace);
-        newPace = {
-            distance: "400",
-            time: allPaces.pace400Min,
-            timeMeasure: 'Min:Sec'
-        }
-        uiCtrl.addListItem(newPace);
 
     };
 
