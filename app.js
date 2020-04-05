@@ -1,15 +1,23 @@
 var paceController = (function() {
 
-    var goalTime = function(distInMeters, time) {
-        this.distInMeters = parseInt(distInMeters);
-        this.time = time;
-        this.minutes = parseInt(time.split(':')[0]);
-        this.seconds = parseInt(time.split(':')[1]);
-        this.timeInSeconds = (this.minutes * 60) + parseInt(this.seconds);
+    var goalTime = function(distance, units, rawTime) {
+        this.distance = distance;
+        this.units = units;
+        this.distInMeters = parseDistance(distance, units);
+        console.log(this.distInMeters);
+        this.rawTime = rawTime;
+        this.time = parseTime(rawTime)
+        this.timeInSeconds = (this.time.minutes * 60) + parseInt(this.time.seconds);
         this.secondsPerMeter = this.timeInSeconds / this.distInMeters;
     }
 
-    var pace = function(distance, paceSeconds, paceMinutes) {
+    var time = function(hours, minutes, seconds) {
+        this.hours = hours;
+        this.minutes = minutes;
+        this.seconds = seconds;
+    }
+
+    var pace = function(distance, paceSeconds) {
         this.distance = distance;
         this.paceSeconds = paceSeconds;
     }
@@ -33,12 +41,35 @@ var paceController = (function() {
 
     const trackDistances = [100, 200, 400, 800, 1000, 1200, 1600];
 
+    function parseDistance(distance, units) {
+        var dist = 0;
+        if (units == 'm') {
+            dist = parseInt(distance);
+        } else if (units == 'km') {
+            dist = parseInt(distance * 1000);
+        } else if (units == 'miles') {
+            dist = convertMilesToMeters(distance);
+        }
+        return dist;
+    }
+
+    function parseTime(rawTime) {
+        var min = parseInt(rawTime.split(':')[0]);
+        var sec = parseInt(rawTime.split(':')[1]);
+        return new time(0, min, sec);
+    }
+
+    function convertMilesToMeters(distance) {
+        // TOTO convert miles to meters
+        return distance;
+    }
+
     function trackTime(secondsPerMeter, distanceInMeters) {
         return Math.round(secondsPerMeter * distanceInMeters,2);
     }
 
     function newRunTime(input) {
-        return new goalTime(input.distance, input.time);
+        return new goalTime(input.distance, input.units, input.time);
     }
 
     function logTrackTime(runTime, trackDistance) {
@@ -79,6 +110,7 @@ var UIController = (function() {
 
     var DOMStrings = {
         inputDistance: '.add__distance',
+        inputUnits: '.add__units',
         inputTime: '.add__time',
         addButton: '.add__btn',
         kmPaceDisplay: '.pace__km--value',
@@ -95,6 +127,7 @@ var UIController = (function() {
         getInput: function() {
             return {
                 distance: document.querySelector(DOMStrings.inputDistance).value,
+                units: document.querySelector(DOMStrings.inputUnits).value,
                 time: document.querySelector(DOMStrings.inputTime).value
             }
         },
@@ -106,9 +139,10 @@ var UIController = (function() {
         addListTitle: function(runTime) {
             var html, newHtml, element;
             element = DOMStrings.paceList;
-            html = '<div class="item clearfix" id="inc-%id%"><div class="item__description">Paces for %distance% KM at: %time%</div>'
-            newHtml = html.replace('%distance%', runTime.distInMeters);
-            newHtml = newHtml.replace('%time%', runTime.time);
+            html = '<div class="item clearfix" id="inc-%id%"><div class="item__description">Paces for %distance% %units% at: %time%</div>'
+            newHtml = html.replace('%distance%', runTime.distance);
+            newHtml = newHtml.replace('%units%', runTime.units);
+            newHtml = newHtml.replace('%time%', runTime.rawTime);
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
         },
 
@@ -148,7 +182,6 @@ var controller = (function(paceCtrl, uiCtrl) {
     };
 
     var ctrlAddTime = function() {
-        console.log("I am here");
         var input
 
         // Get the input data

@@ -27,16 +27,21 @@
         <div class="bottom">
             <div class="add">
                 <div class="add__container">
-                    <input type="number" class="add__distance" placeholder="Distance in Km", value=5000>
-                    <input type="text" class="add__time" placeholder="20:00", value="20:00">
+                    <input type="number" class="add__distance" placeholder="Distance in meters", value=5000>
+                    <input list="units__distance" class="add__units" value="m"> 
+                    <input type="text" class="add__time" placeholder="20:00", value="20:00" pattern="[0-9][0-9]:[0-9][0-9]" title="Time in Minutes:Seconds">
                     <button class="add__btn"><i class="ion-ios-checkmark-outline"></i></button>
+                    <datalist id="units__distance">
+                        <option value="m">
+                        <option value="km">
+                        <option value="miles">
+                      </datalist>
                 </div>
             </div>
 
             <div class="container clearfix">
                 <div class="pace_breakdown">
-                    <h2 class="pace__breakdown__title">Track Pace Breakdown (Distances in meters) <a href="training.pdf">Current training plane</a></h2>
-                    
+                    <h2 class="pace__breakdown__title">Track Pace Breakdown (Distances in meters) </h2>
 
                     <div class="pace_breakdown__list">
 
@@ -54,6 +59,19 @@
 
             </div>
 
+        </div>
+
+        <div class="footer">
+            <footer>
+                <div class="footer__title">
+                    <!-- <p>Posted by: Michael Joyce</p> -->
+                </div>
+                <div class="footer__text">
+                    <p><a href="training.pdf">Current training plan</a></p>
+                    <p>Contact information: <a href="mailto:michael.joyce@illiniarts.com">
+                        michael.joyce@illiniarts.com</a>.</p>
+                </div>
+              </footer>
         </div>
 
         <script src="app.js"></script>
